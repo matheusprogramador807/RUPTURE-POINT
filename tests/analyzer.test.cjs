@@ -13,3 +13,6 @@ assert.ok(hard.notes.every(n=>n.lane>=0&&n.lane<4&&n.side==='player'));
 assert.ok(insane.notes.some((n,i,a)=>i>0&&n.time===a[i-1].time&&n.lane!==a[i-1].lane));
 assert.throws(()=>analyze(new Float32Array(rate*5),rate));
 console.log('MP3 analyzer: timing, density, chords and silent-input failure OK');
+
+const solo=analyze(audio,rate);assert.ok(solo.notes.every(n=>n.side==='player'));assert.ok(new Set(solo.notes.map(n=>n.lane)).size>=3);assert.throws(()=>analyze(audio,0));
+
