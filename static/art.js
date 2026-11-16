@@ -51,22 +51,24 @@ function southpark(kind,c,x,y,s,t,bpm,last,damaged=false,light=false,event=null)
  c.save();c.translate(light?0:dx*.35,light?0:dy*.35);
  path(c,[[-65,112],[-72,145],[-3,145],[-2,115]],'#27282d',ink,3);
  path(c,[[2,115],[3,145],[74,145],[65,112]],'#27282d',ink,3);
- ellipse(c,0,66,k?70:104,69,k?'#e57925':'#d63c42',ink,3);
+ ellipse(c,0,66,k?70:112,69,k?'#e57925':'#d63c42',ink,3);
  c.strokeStyle=k?'#9b4b1f':'#912d32';c.lineWidth=2;c.beginPath();c.moveTo(0,18);c.lineTo(0,127);c.stroke();
+ if(k){for(const side of [-1,1]){const px=side*37;c.strokeStyle='#794421';c.lineWidth=2;c.strokeRect(px-13,58,26,29);path(c,[[px-12,59],[px,72],[px+12,59]],'#d66f23','#794421',2);}}
  for(let b=0;b<3;b++)ellipse(c,7,58+b*23,2,3,'#312a2b',null);
  for(const side of [-1,1]){c.save();c.translate(side*(k?60:91),43);c.rotate(light?0:side*(-.15-v*(side===1?.65:.32)));
  ellipse(c,0,24,17,35,k?'#e57925':'#d63c42',ink,2);ellipse(c,0,49,19,17,k?'#397c3c':'#f5d43e',ink,2);
  if(side===1)mic(c,0,20,-.2);c.restore();}
  c.restore();
  c.save();c.translate(light?0:dx,light?0:dy);c.rotate(light?0:damaged?-.12:[-.09,.025,-.035,.09][l]*v);
- ellipse(c,0,-38,k?74:97,k?72:76,'#f4ceaa',ink,2);
+ ellipse(c,0,-38,k?74:106,k?72:80,'#f4ceaa',ink,2);
  if(k){
  path(c,[[-79,-42],[-80,-111],[-60,-125],[60,-125],[80,-111],[79,-42],[57,-34],[56,-88],[-56,-88],[-57,-34]],'#3b983e',ink,3);
  path(c,[[-57,-94],[57,-94],[57,-114],[-57,-114]],'#317c35',null);
  }else{
- c.save();c.beginPath();c.rect(-100,-150,200,82);c.clip();ellipse(c,0,-72,97,59,'#39b4c6',ink,2);c.restore();
- path(c,[[-96,-78],[96,-78],[96,-65],[-96,-65]],'#f4d43e',null);ellipse(c,0,-132,18,11,'#f4d43e',null);
+ c.save();c.beginPath();c.rect(-110,-150,220,82);c.clip();ellipse(c,0,-72,106,59,'#39b4c6',ink,2);c.restore();
+ path(c,[[-104,-78],[104,-78],[104,-65],[-104,-65]],'#f4d43e',null);ellipse(c,0,-132,18,11,'#f4d43e',null);
  }
+ if(k){for(const side of [-1,1])ellipse(c,side*76,-51,14,39,'#438f38',null);}
  const blink=!light&&!v&&(t%4.7>4.55);
  for(const side of [-1,1]){
  ellipse(c,side*21,-39,21,26,'#fff',null);
@@ -91,6 +93,6 @@ function poster(){const el=document.querySelector('#poster');if(!el)return;const
  // two drawn frames per pose. Input selects a pose without redrawing the artwork.
  const atlases=new Map();
  function atlas(enemy,anger){const key=`${enemy}:${anger}`;if(atlases.has(key))return atlases.get(key);const sheet=document.createElement('canvas');sheet.width=280*16;sheet.height=360;const a=sheet.getContext('2d');for(let pose=0;pose<8;pose++){for(let frame=0;frame<2;frame++){a.save();a.translate((pose*2+frame)*280,0);character(a,140,180,1,enemy,anger,frame?Math.PI/2:Math.PI*1.5,pose===5,pose===6,pose>=1&&pose<=4?pose-1:-1,pose===7);a.restore();}}atlases.set(key,sheet);return sheet;}
- function sprite(c,x,y,s,enemy,anger,t,bpm,last,dodge,attack,damaged=false,light=false){let lane=-1,latest=-Infinity;for(let i=0;i<4;i++)if(last[i]>latest){latest=last[i];lane=i;}const singing=t-latest<.21;let pose=damaged?7:attack?6:dodge?5:singing?lane+1:0;const frame=light?0:Math.floor(t*bpm/60*2)%2;const sheet=atlas(enemy,anger);c.drawImage(sheet,(pose*2+Math.abs(frame))*280,0,280,360,x-140*s,y-180*s,280*s,360*s);}
+ function sprite(c,x,y,s,enemy,anger,t,bpm,last,dodge,attack,damaged=false,light=false,event=null){let lane=-1,latest=-Infinity;for(let i=0;i<4;i++)if(last[i]>latest){latest=last[i];lane=i;}const motion=notePose(t,event);if(event)lane=motion.lane;const singing=event?motion.amount>0:t-latest<.21;let pose=damaged?7:attack?6:dodge?5:singing?lane+1:0;const frame=light?0:Math.floor(t*bpm/60*2)%2;const sheet=atlas(enemy,anger);c.save();if(!light){const strength=motion.amount;c.translate(x,y);c.rotate((damaged?-.045:singing?[-.035,.015,-.015,.035][lane]:0)*strength);c.scale(1+strength*.018,1-strength*.012);c.translate(-x,-y);}c.drawImage(sheet,(pose*2+Math.abs(frame))*280,0,280,360,x-140*s,y-180*s,280*s,360*s);c.restore();}
  addEventListener('resize',poster);document.fonts.ready.then(poster);return{notePose,character,sprite,stage,speaker,mic,poster,cartman,school,southpark,ready:portraitReady};
 })();
